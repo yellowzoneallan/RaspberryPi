@@ -1,0 +1,118 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: apple-app
+  labels:
+    app: apple
+spec:
+  containers:
+    - name: apple-app
+      image: hashicorp/http-echo
+      args:
+        - "-text=red apple"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: apple-service
+spec:
+  selector:
+    app: apple
+  ports:
+    - port: 5678 # Default port for image
+---
+kind: Pod
+apiVersion: v1
+metadata:
+  name: banana-app
+  labels:
+    app: banana
+spec:
+  containers:
+    - name: banana-app
+      image: hashicorp/http-echo
+      args:
+        - "-text=yellow banana"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: banana-service
+spec:
+  selector:
+    app: banana
+  ports:
+    - port: 5678 # Default port for image
+---
+kind: Pod
+apiVersion: v1
+metadata:
+  name: orange-app
+  labels:
+    app: orange
+spec:
+  containers:
+    - name: orange-app
+      image: hashicorp/http-echo
+      args:
+        - "-text=orange orange"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: orange-service
+spec:
+  selector:
+    app: orange
+  ports:
+    - port: 5678 # Default port for image
+---
+kind: Pod
+apiVersion: v1
+metadata:
+  name: grape-app
+  labels:
+    app: grape
+spec:
+  containers:
+    - name: grape-app
+      image: hashicorp/http-echo
+      args:
+        - "-text=green grapes"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: grape-service
+spec:
+  selector:
+    app: grape
+  ports:
+    - port: 5678 # Default port for image
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: fruits-traefik-ingress
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /apple
+            backend:
+              serviceName: apple-service
+              servicePort: 5678
+          - path: /banana
+            backend:
+              serviceName: banana-service
+              servicePort: 5678
+          - path: /orange
+            backend:
+              serviceName: orange-service
+              servicePort: 5678
+          - path: /grape
+            backend:
+              serviceName: grape-service
+              servicePort: 5678

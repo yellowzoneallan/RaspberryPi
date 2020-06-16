@@ -1,0 +1,26 @@
+ENV['VAGRANT_NO_PARALLEL'] = 'yes'
+Vagrant.configure(2) do |config|
+
+  NodeCount = 4
+  # VMs to emulate Raspberry Pi - amd64 not arm64
+  (1..NodeCount).each do |i|
+    config.vm.define "pivm#{i}" do |pi_arm64_vm|
+      pi_arm64_vm.vm.box = "ubuntu/focal64"
+      pi_arm64_vm.vm.hostname = "pivm#{i}.example.com"
+      pi_arm64_vm.vm.network "private_network", ip: "192.168.3.10#{i}"
+      pi_arm64_vm.vm.provider "virtualbox" do |v|
+        v.name = "pivm#{i}"
+        v.memory = 1024
+        v.cpus = 1
+      end
+      pi_arm64_vm.vm.provision "shell", inline: <<-SHELL
+      sudo ufw disable
+      sudo systemctl stop apparmor
+      sudo systemctl disable apparmor
+      sudo sed -i '/swap/d' /etc/fstab
+      sudo swapoff -a
+    SHELL
+  end
+  end
+
+end
